@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的原型作品集</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#181b22;
+    --border:#262a33;
+    --text:#e6e8eb;
+    --muted:#9aa4b0;
+    --accent:#7c9cff;
+    --accent2:#5ad7c0;
+    --tag:#232936;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    padding:48px 24px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  header.hero{margin-bottom:40px;}
+  .hero h1{font-size:34px;letter-spacing:.5px;}
+  .hero h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p{color:var(--muted);margin-top:10px;font-size:15px;}
+  .meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--muted);}
+  .meta b{color:var(--text);font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    overflow:hidden;display:flex;flex-direction:column;
+    transition:.25s;position:relative;
+  }
+  .card:hover{transform:translateY(-4px);border-color:#353b47;box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  .cover{
+    height:140px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1c2030,#232b3d);font-size:44px;
+  }
+  .body{padding:18px 18px 20px;flex:1;display:flex;flex-direction:column;}
+  .body h3{font-size:18px;margin-bottom:6px;}
+  .body p{color:var(--muted);font-size:13.5px;flex:1;}
+  .tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 14px;}
+  .tag{font-size:11.5px;background:var(--tag);color:var(--muted);padding:4px 9px;border-radius:20px;border:1px solid var(--border);}
+  a.visit{
+    text-decoration:none;color:#0f1115;font-weight:600;font-size:14px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));padding:10px 14px;border-radius:10px;
+    text-align:center;transition:.2s;
+  }
+  a.visit:hover{filter:brightness(1.08);}
+  .empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:16px;}
+  footer{margin-top:48px;text-align:center;color:#5c6470;font-size:12.5px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block;margin-right:6px;vertical-align:middle;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1><span>原型作品集</span></h1>
+    <p>高保真交互原型集合 · 点击卡片进入可交互演示</p>
+    <div class="meta">
+      <span><span class="dot"></span>项目总数：<b id="count">0</b></span>
+      <span>数据来源：<b>projects.json</b>（自动扫描 projects/ 目录生成）</span>
+    </div>
+  </header>
+
+  <section id="grid" class="grid"></section>
+  <div id="empty" class="empty" style="display:none;">暂无项目。请在仓库根创建 <b>projects/项目名/</b> 目录，并运行扫描脚本生成 projects.json。</div>
+
+  <footer>© <span id="year"></span> 我的原型作品集 · Hosted on GitHub Pages</footer>
+</div>
+
+<script>
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  document.getElementById('year').textContent=new Date().getFullYear();
+
+  // 项目封面 emoji：可按项目名匹配，缺省用 📁
+  const coverMap={
+    'wecom':'🤖','wecom-bot':'🤖','workbuddy':'🐾','workbuddy-claw':'🐾',
+    'dashboard':'📊','data':'📊','vue':'⚡','react':'⚛️','axure':'🎨','portfolio':'📁'
+  };
+  function pickCover(name){
+    const n=name.toLowerCase();
+    for(const k in coverMap) if(n.includes(k)) return coverMap[k];
+    return '📁';
+  }
+
+  fetch('projects.json',{cache:'no-cache'})
+    .then(r=>{ if(!r.ok) throw new Error('projects.json not found'); return r.json(); })
+    .then(list=>{
+      // 兼容两种格式：数组 或 {projects:[]}
+      const items=Array.isArray(list)?list:(list.projects||[]);
+      document.getElementById('count').textContent=items.length;
+      if(!items.length){ empty.style.display='block'; return; }
+      items.forEach(p=>{
+        const name=p.name||p.title||'';
+        const desc=p.description||p.desc||'交互原型';
+        const tags=(p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+        const url=p.url||`./projects/${encodeURIComponent(name)}/`;
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
+          <div class="cover">${pickCover(name)}</div>
+          <div class="body">
+            <h3>${name}</h3>
+            <p>${desc}</p>
+            <div class="tags">${tags||'<span class="tag">HTML</span>'}</div>
+            <a class="visit" href="${url}" target="_self" rel="noopener">查看原型 →</a>
+          </div>`;
+        grid.appendChild(card);
+      });
+    })
+    .catch(err=>{
+      console.error(err);
+      empty.style.display='block';
+      empty.innerHTML='加载 projects.json 失败：'+err.message+'<br>请先运行扫描脚本生成该文件。';
+    });
+</script>
+</body>
+</html>

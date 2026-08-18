@@ -1,0 +1,22 @@
+{
+  "projects": [
+    {
+      "name": "企微智能机器人后台",
+      "description": "Axure 高保真 · 创建 / 配置 / 监控闭环",
+      "url": "./projects/企微智能机器人后台/start.html",
+      "tags": ["Axure", "高保真", "B 端"]
+    },
+    {
+      "name": "WorkBuddy Claw 远程控制",
+      "description": "手写 HTML/CSS · 移动端指令流",
+      "url": "./projects/WorkBuddy Claw/",
+      "tags": ["HTML", "移动端"]
+    },
+    {
+      "name": "数据看板",
+      "description": "Vue3 + ECharts · 动态筛选与可视化",
+      "url": "./projects/data-dashboard/",
+      "tags": ["Vue", "ECharts"]
+    }
+  ]
+}
