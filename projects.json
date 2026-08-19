@@ -15,7 +15,7 @@
     {
       "name": "运营管理",
       "description": "Vue3 + ECharts · 动态筛选与可视化",
-      "url": "./projects/YA_运营管理/dist/",
+      "url": "./projects/YA_运营管理/",
       "tags": ["Vue", "ECharts"]
     }
   ]
